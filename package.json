@@ -1,6 +1,6 @@
 {
   "name": "claudeforge-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Forge production-ready AI agent projects — agents, slash commands, memory, CI/CD, and devcontainers in one command",
   "bin": {
     "claudeforge": "bin/cli.js"

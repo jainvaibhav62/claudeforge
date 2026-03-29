@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "claudeforge"
-version = "1.0.0"
+version = "1.0.1"
 description = "Forge production-ready AI agent projects — agents, slash commands, memory, CI/CD, and devcontainers in one command"
 readme = "README.md"
 requires-python = ">=3.8"

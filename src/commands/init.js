@@ -36,6 +36,7 @@ const MANIFEST = [
   { type: 'file', src: 'claude/commands/review-pr.md.tpl',       dest: '.claude/commands/review-pr.md' },
   // AI setup & maintenance commands
   { type: 'file', src: 'claude/commands/setup-project.md.tpl',   dest: '.claude/commands/setup-project.md' },
+  { type: 'file', src: 'claude/commands/analyze-project.md.tpl', dest: '.claude/commands/analyze-project.md' },
   { type: 'file', src: 'claude/commands/memory-sync.md.tpl',     dest: '.claude/commands/memory-sync.md' },
   { type: 'file', src: 'claude/commands/project-health.md.tpl',  dest: '.claude/commands/project-health.md' },
   // Developer productivity commands

@@ -332,7 +332,8 @@ Run these in the Claude Code chat window in VS Code, JetBrains, or any Claude Co
 
 | Command | When to run | What it does |
 |---------|-------------|-------------|
-| `/setup-project "description"` | After `claudeforge init` | Fills in CLAUDE.md, settings, .env.example, .mcp.json, memory, generates 2–4 project-specific agents and commands, then documents every file it creates |
+| `/analyze-project` | Existing project, no description needed | Reads your actual codebase — code, patterns, conventions, git history — and generates the full Claude Code setup automatically |
+| `/setup-project "description"` | New project or when you want to describe it manually | Fills in CLAUDE.md, settings, .env.example, .mcp.json, memory, generates project-specific skills, agents, and commands |
 | `/scaffold-structure` | After `/setup-project` | Creates the actual `src/`, `tests/`, `cmd/` directory structure with real starter files for your stack |
 | `/project-health` | Weekly / after big changes | Audits your setup: checks CLAUDE.md completeness, hook coverage, memory fill level, and gives prioritized improvement suggestions |
 | `/memory-sync` | End of work session | Reviews the session and updates `memory/` files with preferences, decisions, and project context |

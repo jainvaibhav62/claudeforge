@@ -10,22 +10,22 @@ Do not ask the user for a description. Read the codebase directly to infer every
 ### 1a. Project identity
 
 !`ls -la`
-!`cat package.json 2>/dev/null || cat pyproject.toml 2>/dev/null || cat go.mod 2>/dev/null || cat Cargo.toml 2>/dev/null || echo "(no manifest found)"`
-!`cat README.md 2>/dev/null | head -60 || echo "(no README)"`
+!`test -f package.json && cat package.json || test -f pyproject.toml && cat pyproject.toml || test -f go.mod && cat go.mod || test -f Cargo.toml && cat Cargo.toml || echo "(no manifest found)"`
+!`test -f README.md && head -60 README.md || echo "(no README)"`
 
 ### 1b. Full dependency map
 
-!`cat package.json 2>/dev/null || echo "(no package.json)"`
-!`cat requirements.txt 2>/dev/null || cat pyproject.toml 2>/dev/null || echo "(no python deps)"`
-!`cat go.mod 2>/dev/null || echo "(no go.mod)"`
-!`cat Cargo.toml 2>/dev/null || echo "(no Cargo.toml)"`
-!`cat pom.xml 2>/dev/null | head -80 || echo "(no pom.xml)"`
-!`cat Gemfile 2>/dev/null || echo "(no Gemfile)"`
+!`test -f package.json && cat package.json || echo "(no package.json)"`
+!`test -f requirements.txt && cat requirements.txt || test -f pyproject.toml && cat pyproject.toml || echo "(no python deps)"`
+!`test -f go.mod && cat go.mod || echo "(no go.mod)"`
+!`test -f Cargo.toml && cat Cargo.toml || echo "(no Cargo.toml)"`
+!`test -f pom.xml && head -80 pom.xml || echo "(no pom.xml)"`
+!`test -f Gemfile && cat Gemfile || echo "(no Gemfile)"`
 
 ### 1c. Project structure
 
-!`find . -type f \( -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.java" -o -name "*.rb" \) -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/__pycache__/*" -not -path "*/target/*" 2>/dev/null | head -80 || echo "(no source files found)"`
-!`find . -type d -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/__pycache__/*" -not -path "*/target/*" -not -path "*/dist/*" 2>/dev/null | head -40 || echo "(no directories found)"`
+!`find . -type f \( -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.java" -o -name "*.rb" \) -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/__pycache__/*" -not -path "*/target/*" | head -80`
+!`find . -type d -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/__pycache__/*" -not -path "*/target/*" -not -path "*/dist/*" | head -40`
 
 ### 1d. Read actual source code — infer real patterns
 
@@ -48,17 +48,17 @@ Read enough code to answer:
 
 ### 1e. Git history — understand how the project evolved
 
-!`git log --oneline -20 2>/dev/null || echo "(no git history)"`
-!`git log --pretty=format:"%s" -50 2>/dev/null | sort | uniq -c | sort -rn | head -20 || echo "(no commits)"`
+!`git log --oneline -20 || echo "(no git history)"`
+!`git log --pretty=format:"%s" -50 | sort | uniq -c | sort -rn | head -20 || echo "(no commits)"`
 
 What do the commit messages reveal about the team's workflow and focus areas?
 
 ### 1f. Existing CI/CD and infrastructure
 
-!`find .github/workflows -name "*.yml" 2>/dev/null | head -5 | xargs cat 2>/dev/null | head -100 || echo "(no GitHub Actions)"`
-!`cat Dockerfile 2>/dev/null | head -40 || echo "(no Dockerfile)"`
-!`cat docker-compose.yml 2>/dev/null || echo "(no docker-compose)"`
-!`cat .env.example 2>/dev/null || cat .env.sample 2>/dev/null || echo "(no .env.example)"`
+!`test -d .github/workflows && find .github/workflows -name "*.yml" | head -5 | xargs head -100 || echo "(no GitHub Actions)"`
+!`test -f Dockerfile && head -40 Dockerfile || echo "(no Dockerfile)"`
+!`test -f docker-compose.yml && cat docker-compose.yml || echo "(no docker-compose)"`
+!`test -f .env.example && cat .env.example || test -f .env.sample && cat .env.sample || echo "(no .env.example)"`
 
 ---
 

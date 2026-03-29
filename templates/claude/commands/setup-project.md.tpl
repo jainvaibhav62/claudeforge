@@ -1,5 +1,5 @@
 ---
-description: AI-fill the complete Claude Code project configuration. Run after `claudeforge project "description"` — or run it directly with your project description as the argument. Generates CLAUDE.md, settings, agents, commands, memory, and more.
+description: AI-fill the complete Claude Code project configuration. Run after `claudeforge project "description"` — or run it directly with your project description as the argument. Generates CLAUDE.md, settings, skills, agents, commands, memory, and more.
 allowed-tools: Read, Write, Edit, MultiEdit, Bash(git status:*), Bash(git log:*), Bash(ls:*), Bash(find:*), Bash(cat:*), Bash(rm:*)
 ---
 
@@ -46,7 +46,7 @@ Write a complete `CLAUDE.md` that includes:
 
 **Gotchas**: 3–5 non-obvious things about this stack (e.g., "FastAPI route order matters — more specific routes must be declared before generic ones").
 
-**Workflow**: How to use `/commit`, `/review-pr`, and project-specific agents.
+**Workflow**: How to use `/commit`, `/review-pr`, and which skills and agents apply to this project.
 
 ### 2b. Update `.claude/settings.json`
 
@@ -84,37 +84,114 @@ Always keep `context7`. Add servers based on the stack:
 ### 2e. Rewrite `memory/project_ai_workflow.md`
 
 Write a complete, project-specific workflow document:
-- Which agents to use and when (be explicit: "use `api-reviewer` whenever adding a new endpoint")
+- Which skills load automatically and when (be explicit: "the `prisma` skill loads whenever writing database queries")
+- Which agents to use and when (be explicit: "use `security-auditor` whenever adding auth or payment logic")
 - Which slash commands map to which tasks
 - MCP servers available and how to invoke them
 - Project-specific AI conventions (e.g., "always read `src/db/schema.py` before writing queries")
 - Any architectural decisions that Claude should know and respect
 
-### 2f. Create 2–4 Specialized Agents
+---
 
-Create agent files in `.claude/agents/`. Choose agents appropriate to the project type:
+### 2f. Infer and Create Skills — Domain Specialists
 
-**For API/Backend projects:**
-- `api-reviewer.md` — Reviews new endpoints: checks REST conventions, input validation, auth, error responses, OpenAPI compliance
-- `db-reviewer.md` — Reviews database changes: checks query performance, migration safety, index coverage, N+1 risks
+**Skills** live in `.claude/skills/` and are loaded as context *before* Claude writes code. They encode how to write code correctly for a specific domain in this project — like a senior developer's internal style guide baked into Claude's context.
 
-**For Frontend projects:**
-- `component-reviewer.md` — Reviews UI components: checks accessibility, responsive design, prop types, performance (memo, useMemo)
-- `ux-checker.md` — Reviews user-facing copy, loading states, error states, empty states
+#### Step 1 — Identify the distinct technical domains in this project
 
-**For Data/ML projects:**
-- `data-validator.md` — Validates data pipelines: schema consistency, null handling, statistical reasonableness
-- `ml-reviewer.md` — Reviews model code: data leakage, correct train/val/test splits, metric definitions
+Read the project description and detected files. Extract every distinct technical concern that has its own patterns, conventions, or APIs. Each is a candidate for a skill. Think domain-by-domain:
 
-**For all projects:**
-- `security-auditor.md` — Deep security review: focuses on auth flows, input sanitization, secrets management, dependency CVEs
+- "Next.js SaaS with Stripe, Prisma, and Clerk auth"
+  → domains: Next.js components/pages, Stripe payments, Prisma queries, Clerk authentication
+- "Go gRPC microservice with PostgreSQL and Redis"
+  → domains: gRPC service definitions, PostgreSQL queries, Redis caching
+- "React Native app with Firebase and Expo"
+  → domains: React Native screens/navigation, Firebase Firestore, Firebase Auth, Expo config
+- "Django REST API with Celery and S3"
+  → domains: Django REST endpoints, Celery tasks, S3 file handling
+- "Rust CLI tool for CSV parsing"
+  → domains: CLI argument parsing, CSV parsing/transformation, Rust error handling
 
-Each agent must have:
-- Accurate `description` frontmatter (this determines when Claude invokes it automatically)
-- A detailed system prompt with a numbered checklist specific to the project
-- A clear output format
+There is no fixed number — create as many skills as there are meaningful, distinct domains with non-obvious conventions. A simple project may need 2. A complex one may need 6.
 
-### 2g. Create 2–4 Slash Commands
+#### Step 2 — Create a SKILL.md for each domain
+
+Each skill lives at `.claude/skills/<domain-name>/SKILL.md`.
+
+Every skill file must have:
+
+```
+---
+description: "<precise trigger condition — when should Claude load this skill>"
+---
+```
+
+The `description` is the most important field. Write it as a specific trigger condition so Claude loads it at exactly the right moment:
+- Good: `"Load when writing or modifying any Stripe payment intent, webhook handler, or subscription logic"`
+- Bad: `"Stripe knowledge"`
+
+The skill body must read like a senior developer's internal guide for this domain in this specific project. Include:
+
+1. **Overview** — what this domain does in this project, which files/folders it lives in
+2. **Conventions** — naming patterns, file structure, how new files should be organized
+3. **Key patterns** — the specific way this project does things (e.g., "all Prisma queries go through `src/lib/db.ts`, never import PrismaClient directly")
+4. **Integration points** — how this domain connects to others (e.g., "Stripe webhooks call the same service layer as the REST API")
+5. **Common mistakes** — non-obvious pitfalls specific to this stack/version
+6. **Examples** — 1–2 short, concrete code snippets showing the right pattern for this project
+
+#### Step 3 — Always create the base `project-conventions` skill
+
+Update `.claude/skills/project-conventions/SKILL.md` with project-specific conventions:
+- Commit message format
+- PR conventions
+- General code style rules that apply across all domains
+- How to name files, variables, functions in this project
+
+---
+
+### 2g. Infer and Create Agents — Reviewers and Auditors
+
+**Agents** live in `.claude/agents/` and are invoked as focused subagents to *review, audit, or run a workflow* independently. They have tool access. Do not create agents for writing code — that is what skills are for.
+
+#### Step 1 — Identify domains that have non-obvious review risks
+
+Not every domain needs a reviewer agent. Only create one when a focused checklist genuinely adds value — e.g., database migrations (irreversible), payment flows (financial risk), auth logic (security risk), caching strategies (correctness risk).
+
+Examples by project type:
+- "Next.js SaaS with Stripe, Prisma, and Clerk" → `stripe-reviewer` (payment correctness), `db-reviewer` (migration safety)
+- "Go gRPC microservice with PostgreSQL and Redis" → `db-reviewer` (query performance), `api-reviewer` (gRPC contract safety)
+- "React Native app with Firebase" → `security-auditor` (Firebase rules, auth), `performance-reviewer` (React Native render performance)
+- "Django REST API with Celery" → `api-reviewer` (REST conventions), `db-reviewer` (ORM query safety)
+
+#### Step 2 — Create a reviewer agent for each high-risk domain
+
+Each agent file at `.claude/agents/<name>.md` must have:
+
+```
+---
+description: "<precise trigger — when Claude should invoke this agent>"
+---
+```
+
+The agent body must include:
+1. A focused role statement — what this agent reviews and why it matters
+2. A numbered checklist specific to this stack and domain
+3. A clear output format: severity rating per issue, actionable fix suggestion
+
+#### Step 3 — Always create these two agents regardless of project type
+
+- `code-reviewer.md` — General code review across correctness, error handling, style, test coverage, and documentation. Invoked before every PR.
+- `security-auditor.md` — Reviews any code touching auth, secrets, input validation, or external APIs. No tool access restrictions.
+
+#### Rules for all agents
+
+- `description` must be a specific trigger condition, not a job title
+- Reviewer checklists must be tailored to the actual stack — not generic
+- Every agent must have a clear output format with severity levels
+
+---
+
+### 2h. Create 2–4 Slash Commands
 
 Create command files in `.claude/commands/` specific to this workflow:
 
@@ -126,7 +203,7 @@ Create command files in `.claude/commands/` specific to this workflow:
 
 Each command must use `!` dynamic context (e.g., `!git diff`, `!npm test 2>&1`) and have a clear `## Task` section.
 
-### 2h. Append `.gitignore` Tech-Stack Patterns
+### 2i. Append `.gitignore` Tech-Stack Patterns
 
 Append a labeled section with patterns for this stack. Examples:
 - Python: `__pycache__/`, `*.pyc`, `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/`, `dist/`, `*.egg-info/`
@@ -150,25 +227,30 @@ rm -f SETUP_CONTEXT.md
 
 After all files are written, go back and add a documentation header to each one so users know what they're looking at and what to customize.
 
-For each file written, prepend (or add at an appropriate location):
-
 **CLAUDE.md** — add at the top after the title:
 ```
 > **Setup status**: Generated by claudeforge. Update the Commands table with your actual
 > project commands after verifying them. Fill in the Gotchas section as you discover them.
 ```
 
-**`.claude/settings.json`** — add a `_readme` key (JSON doesn't support comments, use this):
+**`.claude/settings.json`** — add a `_readme` key:
 ```json
-"_readme": "Team-shared Claude Code settings. Personal overrides go in settings.local.json (gitignored). See .claude/README.md for the full reference."
+"_readme": "Team-shared Claude Code settings. Personal overrides go in settings.local.json (gitignored)."
+```
+
+**Each skill file** — after the frontmatter, add:
+```
+<!-- WHAT THIS IS: A skill that loads as context when Claude works in this domain.
+     HOW IT WORKS: Claude reads this automatically before writing code that matches the description.
+     HOW TO CUSTOMIZE: Update the patterns and examples below as your project evolves.
+     THINGS TO ADD: New conventions, discovered gotchas, team-specific patterns. -->
 ```
 
 **Each agent file** — after the frontmatter, add:
 ```
-<!-- WHAT THIS IS: A Claude sub-agent that specializes in [specific task].
+<!-- WHAT THIS IS: A reviewer agent Claude invokes to audit this domain.
      HOW TO INVOKE: Claude uses this automatically when the task matches the description.
-     HOW TO CUSTOMIZE: Edit the checklist items below to match your project's specific patterns.
-     THINGS TO ADD: Project-specific anti-patterns, naming conventions, architectural rules. -->
+     HOW TO CUSTOMIZE: Edit the checklist items to match your project's specific patterns. -->
 ```
 
 **Each command file** — after the frontmatter, add:
@@ -205,8 +287,28 @@ Generated by `/setup-project` on [today's date].
 | `.env.example` | Documents required env vars | Update with any new vars; never commit real values |
 | `.mcp.json` | MCP servers your team shares | Add connection strings to .env for any DB servers |
 | `memory/project_ai_workflow.md` | AI conventions for this project | Update as your workflow evolves; Claude reads this every session |
-| [agent files] | Specialized review agents | Customize checklists to add project-specific patterns |
+| [skill files] | Domain expertise loaded before writing code | Update conventions as the project evolves |
+| [agent files] | Specialized reviewer agents | Customize checklists to add project-specific patterns |
 | [command files] | Slash commands for your workflow | Edit the ## Task section to match your exact needs |
+
+## Skills Available
+
+Claude loads these automatically before writing code in each domain:
+
+| Skill | Loaded When |
+|-------|------------|
+| `project-conventions` | Always — applies to all code |
+| *(project-specific skills)* | See `.claude/skills/` for the full list |
+
+## Agents Available
+
+Claude invokes these automatically to review and audit:
+
+| Agent | Invoked When |
+|-------|-------------|
+| `code-reviewer` | After writing code, before PR |
+| `security-auditor` | Any auth, secrets, or input-handling code |
+| *(project-specific reviewers)* | See `.claude/agents/` for the full list |
 
 ## Slash Commands Available
 
@@ -223,15 +325,6 @@ Run these in the Claude Code chat window:
 | `/scaffold-structure` | Once — creates the src/, tests/, etc. directory structure |
 | [project commands] | See .claude/commands/ for project-specific commands |
 
-## Agents Available
-
-Claude uses these automatically based on what you're doing:
-
-| Agent | Invoked When |
-|-------|-------------|
-| `code-reviewer` | After writing code, before PR |
-| [project agents] | See .claude/agents/ for project-specific agents |
-
 ## Next Steps
 
 1. **Verify commands** in `CLAUDE.md` — run each one and confirm they work
@@ -247,7 +340,7 @@ Claude uses these automatically based on what you're doing:
 
 Print a clear summary of everything that was done:
 
-1. List every file written
+1. List every skill created with its trigger description
 2. List every agent created with its trigger description
 3. List every slash command created with its use case
 4. State the exact next step: "Run `/scaffold-structure` in Claude Code to create your project's directory structure"

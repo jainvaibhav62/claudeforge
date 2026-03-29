@@ -92,15 +92,21 @@ Best if you already have Node.js installed.
 npm install -g claudeforge-cli
 ```
 
-### via pip
+### via pip / uv
 
 Best if you primarily work in Python environments. Node.js 18+ must still be installed on your system (see [Requirements](#requirements) above).
 
 ```bash
+# pip
 pip install claudeforge
+
+# uv (recommended — installs as a global CLI tool)
+uv tool install claudeforge
 ```
 
-> The pip package is a thin wrapper — when you run `claudeforge`, it locates Node.js on your PATH and delegates all commands to the Node.js CLI automatically. No manual Node.js setup is required beyond having it installed.
+> **Important:** If using `uv`, use `uv tool install` — not `uv pip install`. The `pip` variant installs into a virtualenv and won't put `claudeforge` on your PATH.
+
+> The pip/uv package is a thin wrapper — when you run `claudeforge`, it locates Node.js on your PATH and delegates all commands to the Node.js CLI automatically.
 
 ### Verify installation
 
@@ -428,6 +434,13 @@ export PATH="$(npm prefix -g)/bin:$PATH"
 # Ensure pip user bin is on PATH
 export PATH="$HOME/.local/bin:$PATH"
 # Add to ~/.zshrc or ~/.bashrc to persist
+```
+
+**`claudeforge: command not found` after `uv pip install`**
+
+`uv pip install` puts packages into a virtualenv, not on your PATH. Use `uv tool install` instead:
+```bash
+uv tool install claudeforge
 ```
 
 **`Node.js is required but was not found on PATH`**

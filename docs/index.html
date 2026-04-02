@@ -760,7 +760,12 @@
       <div class="feature-card">
         <div class="feature-icon" style="background:rgba(251,191,36,0.1)">🔒</div>
         <h3>Safety Hooks</h3>
-        <p>Pre-configured hooks block <code>rm -rf</code>, <code>curl | bash</code>, and credential file edits before they execute. Ship fast without shooting yourself in the foot.</p>
+        <p>Pre-configured hooks block <code>rm -rf</code>, <code>curl | bash</code>, and credential file edits before they execute — and emit every tool call to a live activity log.</p>
+      </div>
+      <div class="feature-card" style="border-color:rgba(108,99,255,0.2);background:linear-gradient(135deg,rgba(108,99,255,0.07),var(--bg-card))">
+        <div class="feature-icon" style="background:rgba(108,99,255,0.15)">📡</div>
+        <h3>Live Agent Dashboard <span style="font-size:0.68rem;background:rgba(108,99,255,0.15);color:var(--accent2);padding:.15rem .45rem;border-radius:4px;font-weight:600;vertical-align:middle;margin-left:.35rem">NEW</span></h3>
+        <p>Run <code>claudeforge watch</code> to open a real-time browser dashboard. See which agent is running which tool, the exact command or file, and a live colour-coded event feed.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background:rgba(248,113,113,0.1)">🏗️</div>
@@ -852,6 +857,10 @@
         <button class="ex-tab" onclick="switchExample('ex6', this)">
           <span class="ex-tab-label">Add to Existing</span>
           <span class="ex-tab-sub">Existing repo</span>
+        </button>
+        <button class="ex-tab" onclick="switchExample('ex7', this)" style="border-color:rgba(108,99,255,0.35)">
+          <span class="ex-tab-label" style="color:var(--accent2)">📡 Watch Dashboard</span>
+          <span class="ex-tab-sub">Live agent activity</span>
         </button>
       </div>
 
@@ -1061,6 +1070,128 @@
             </div>
           </div>
         </div>
+
+        <!-- EX 7 -->
+        <div class="example-panel" id="ex7">
+          <p class="example-desc">
+            Open the live agent dashboard to see exactly what Claude is doing behind the scenes — which agent, which tool, and on what file or command — in real time.
+          </p>
+
+          <!-- Mini dashboard preview -->
+          <div style="background:#0a0b0e;border:1px solid rgba(108,99,255,0.25);border-radius:10px;overflow:hidden;margin-bottom:1.2rem">
+            <div style="background:#161820;padding:.5rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:.6rem">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#a78bfa">claudeforge<span style="color:#4b5563">.watch</span></span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;display:inline-block;animation:blink 2s ease infinite"></span>
+              <span style="font-size:.72rem;color:#4ade80">live</span>
+              <span style="margin-left:auto;font-size:.72rem;color:#4b5563;font-family:'JetBrains Mono',monospace" id="demoCount">0 events</span>
+            </div>
+            <div style="display:grid;grid-template-columns:140px 1fr 180px;height:150px;overflow:hidden">
+              <!-- Agents column -->
+              <div style="border-right:1px solid rgba(255,255,255,0.06);padding:.6rem;display:flex;flex-direction:column;gap:.35rem">
+                <div id="demoAgent1" style="background:#161820;border:1px solid rgba(255,255,255,0.06);border-radius:7px;padding:.5rem .65rem">
+                  <div style="display:flex;align-items:center;gap:.4rem">
+                    <div id="demoAgent1Dot" style="width:7px;height:7px;border-radius:50%;background:#4b5563;flex-shrink:0;transition:background .3s"></div>
+                    <span style="font-size:.72rem;font-weight:600">claude</span>
+                  </div>
+                  <div id="demoAgent1Tool" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#6b7280;margin-top:.25rem">idle</div>
+                </div>
+                <div id="demoAgent2" style="background:#161820;border:1px solid rgba(255,255,255,0.06);border-radius:7px;padding:.5rem .65rem">
+                  <div style="display:flex;align-items:center;gap:.4rem">
+                    <div id="demoAgent2Dot" style="width:7px;height:7px;border-radius:50%;background:#4b5563;flex-shrink:0;transition:background .3s"></div>
+                    <span style="font-size:.72rem;font-weight:600">code-reviewer</span>
+                  </div>
+                  <div id="demoAgent2Tool" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#6b7280;margin-top:.25rem">idle</div>
+                </div>
+              </div>
+              <!-- Active task column -->
+              <div style="display:flex;align-items:center;justify-content:center;padding:.8rem;position:relative">
+                <div id="demoTask" style="background:#111318;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:1rem;width:100%;display:none">
+                  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem">
+                    <span id="demoTaskIcon" style="font-size:1.1rem">⚡</span>
+                    <div>
+                      <div id="demoTaskTool" style="font-weight:700;font-size:.85rem;color:#fb923c">Bash</div>
+                      <div id="demoTaskAgent" style="font-size:.68rem;color:#6b7280">via claude</div>
+                    </div>
+                    <div style="width:7px;height:7px;border-radius:50%;background:#4ade80;margin-left:auto;animation:blink 1.2s ease infinite"></div>
+                  </div>
+                  <div id="demoTaskDetail" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,0.06);border-radius:5px;padding:.4rem .6rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:#a78bfa;word-break:break-all"></div>
+                </div>
+                <div id="demoIdle" style="text-align:center;color:#4b5563;font-size:.78rem">
+                  <div style="font-size:1.5rem;margin-bottom:.3rem;opacity:.4">🤖</div>
+                  <div>Waiting for activity…</div>
+                </div>
+              </div>
+              <!-- Feed column -->
+              <div style="border-left:1px solid rgba(255,255,255,0.06);padding:.5rem;overflow:hidden;display:flex;flex-direction:column;gap:.25rem" id="demoFeed"></div>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal — separate window</span>
+              <button class="copy-code-btn" onclick="copyBlock('ex7-code', this)">Copy</button>
+            </div>
+            <div class="code-body" id="ex7-code">
+<span class="c-comment"># Start the dashboard in a separate terminal tab</span>
+<span class="c-prompt">$</span> <span class="c-cmd">claudeforge watch</span>
+<span class="c-success">  ✓ Agent dashboard running at http://localhost:7337</span>
+<span class="c-info">  Activity log: .claude/agent-activity.jsonl</span>
+<span class="c-info">  Press Ctrl+C to stop</span>
+
+<span class="c-comment"># Now run any slash command in Claude Code — the dashboard updates live</span>
+<span class="c-prompt">></span> <span class="c-cmd">/review-pr</span>
+<span class="c-out">  Dashboard: code-reviewer ● running  Read src/auth.ts</span>
+<span class="c-out">  Dashboard: code-reviewer ● running  Grep "TODO|FIXME"</span>
+<span class="c-out">  Dashboard: code-reviewer ✓ done     7 categories reviewed</span>
+
+<span class="c-comment"># Custom port, no auto-open</span>
+<span class="c-prompt">$</span> <span class="c-cmd">claudeforge watch --port 8080 --no-browser</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section id="dashboard-preview" style="background:var(--bg);padding:5rem 2rem 4rem">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:2.5rem">
+      <div class="section-label">Live Agent Dashboard</div>
+      <h2 class="section-title"><em>See inside</em> every agent call</h2>
+      <p class="section-sub" style="margin:.8rem auto 0">
+        Run <code style="font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:.9rem">claudeforge watch</code> and a browser dashboard streams every tool call in real time — agent cards, active task detail, colour-coded feed.
+      </p>
+    </div>
+
+    <div style="
+      border-radius:14px;overflow:hidden;
+      border:1px solid rgba(108,99,255,0.2);
+      box-shadow:0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+      opacity:0;transform:translateY(28px);transition:opacity .6s,transform .6s;
+    " class="dashboard-img-wrap" id="dashPreviewWrap">
+      <img
+        src="assets/dashboard-preview.svg"
+        alt="claudeforge watch — live agent activity dashboard showing code-reviewer agent running an Edit tool call on src/billing/checkout.py with a real-time event feed"
+        style="width:100%;display:block"
+        loading="lazy"
+      />
+    </div>
+
+    <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.8rem">
+      <div style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;color:var(--text-dim)">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);display:inline-block"></span>
+        Agents light up when active
+      </div>
+      <div style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;color:var(--text-dim)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.75rem;background:rgba(251,191,36,0.12);color:#fbbf24;padding:.1rem .4rem;border-radius:3px">✏️ Edit</span>
+        Colour-coded by tool type
+      </div>
+      <div style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;color:var(--text-dim)">
+        <span style="font-size:.9rem">📡</span>
+        Zero config — just run <code style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent2)">claudeforge watch</code>
       </div>
     </div>
   </div>
@@ -1161,6 +1292,7 @@
           <div class="cmd-item"><div class="cmd-name">status</div><div class="cmd-desc">Show configured agents, commands, memory files, and MCP servers</div></div>
           <div class="cmd-item"><div class="cmd-name">upgrade</div><div class="cmd-desc">Update built-in hooks and commands to latest (safe, preserves edits)</div></div>
           <div class="cmd-item"><div class="cmd-name">clear</div><div class="cmd-desc">Remove all claudeforge files (keeps your source code)</div></div>
+          <div class="cmd-item" style="border-color:rgba(108,99,255,0.25);background:rgba(108,99,255,0.04)"><div class="cmd-name" style="color:#a78bfa">watch</div><div class="cmd-desc">Open live agent dashboard at localhost:7337 — real-time tool activity via SSE</div></div>
         </div>
       </div>
       <div class="cmd-group">
@@ -1358,12 +1490,100 @@
     });
   }, { threshold: 0.12 });
 
+  // Dashboard preview fade-in
+  const dashWrap = document.getElementById('dashPreviewWrap');
+  if (dashWrap) {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          dashWrap.style.opacity = '1';
+          dashWrap.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 }).observe(dashWrap);
+  }
+
   document.querySelectorAll(
     '.feature-card, .step, .stat, .agent-card, .cmd-item'
   ).forEach((el, i) => {
     el.style.transitionDelay = (i % 4) * 0.07 + 's';
     observer.observe(el);
   });
+
+  /* ── Mini dashboard demo (ex7) ──────────────────── */
+  const demoEvents = [
+    { agent:'claude',        tool:'Read',  icon:'📖', color:'#38bdf8', detail:'src/auth/middleware.ts' },
+    { agent:'claude',        tool:'Grep',  icon:'🔎', color:'#a78bfa', detail:'pattern: "TODO|FIXME"' },
+    { agent:'code-reviewer', tool:'Read',  icon:'📖', color:'#38bdf8', detail:'src/billing/checkout.py' },
+    { agent:'claude',        tool:'Edit',  icon:'✏️',  color:'#fbbf24', detail:'src/auth/middleware.ts' },
+    { agent:'code-reviewer', tool:'Bash',  icon:'⚡', color:'#fb923c', detail:'pytest tests/billing/' },
+    { agent:'claude',        tool:'Write', icon:'💾', color:'#4ade80', detail:'src/auth/types.ts' },
+    { agent:'code-reviewer', tool:'Grep',  icon:'🔎', color:'#a78bfa', detail:'pattern: "stripe_id"' },
+    { agent:'claude',        tool:'Bash',  icon:'⚡', color:'#fb923c', detail:'npm run lint' },
+  ];
+  let demoIdx = 0, demoCnt = 0;
+  let demoRunning = false;
+
+  function runDemoStep() {
+    if (!demoRunning) return;
+    const ev = demoEvents[demoIdx % demoEvents.length];
+    demoIdx++;
+    demoCnt++;
+    document.getElementById('demoCount').textContent = demoCnt + ' events';
+
+    const isAgent1 = ev.agent === 'claude';
+    const dotEl   = document.getElementById(isAgent1 ? 'demoAgent1Dot'  : 'demoAgent2Dot');
+    const toolEl  = document.getElementById(isAgent1 ? 'demoAgent1Tool' : 'demoAgent2Tool');
+    const cardEl  = document.getElementById(isAgent1 ? 'demoAgent1'     : 'demoAgent2');
+
+    // Activate agent
+    dotEl.style.background = '#4ade80';
+    dotEl.style.boxShadow  = '0 0 6px #4ade80';
+    toolEl.textContent = ev.icon + ' ' + ev.tool;
+    cardEl.style.borderColor = 'rgba(108,99,255,.4)';
+
+    // Show active task
+    document.getElementById('demoIdle').style.display = 'none';
+    const task = document.getElementById('demoTask');
+    task.style.display = 'block';
+    document.getElementById('demoTaskIcon').textContent  = ev.icon;
+    document.getElementById('demoTaskTool').textContent  = ev.tool;
+    document.getElementById('demoTaskTool').style.color  = ev.color;
+    document.getElementById('demoTaskAgent').textContent = 'via ' + ev.agent;
+    document.getElementById('demoTaskDetail').textContent = ev.detail;
+
+    // Feed item
+    const feed = document.getElementById('demoFeed');
+    const item = document.createElement('div');
+    item.style.cssText = 'background:#161820;border:1px solid rgba(255,255,255,.05);border-radius:5px;padding:.3rem .5rem;flex-shrink:0;animation:feedSlide .2s ease both';
+    item.innerHTML = `<span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;background:${ev.color}22;color:${ev.color};padding:.1rem .3rem;border-radius:3px">${ev.icon} ${ev.tool}</span> <span style="font-size:.63rem;color:#6b7280">${ev.agent}</span>`;
+    feed.insertBefore(item, feed.firstChild);
+    if (feed.children.length > 4) feed.lastChild.remove();
+
+    // Reset after delay
+    setTimeout(() => {
+      dotEl.style.background = '#4b5563';
+      dotEl.style.boxShadow  = 'none';
+      toolEl.textContent = 'idle';
+      cardEl.style.borderColor = 'rgba(255,255,255,.06)';
+      task.style.display = 'none';
+      document.getElementById('demoIdle').style.display = 'block';
+    }, 1600);
+  }
+
+  // Start/stop demo when ex7 tab is visible
+  const origSwitchExample = window.switchExample;
+  window.switchExample = function(id, btn) {
+    origSwitchExample(id, btn);
+    demoRunning = (id === 'ex7');
+    if (demoRunning) {
+      (function loop() {
+        if (!demoRunning) return;
+        runDemoStep();
+        setTimeout(loop, 2000);
+      })();
+    }
+  };
 
   /* ── Star section ────────────────────────────────── */
 

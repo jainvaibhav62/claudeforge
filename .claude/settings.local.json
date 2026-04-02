@@ -5,7 +5,9 @@
       "Bash(node bin/cli.js add --help)",
       "Bash(node bin/cli.js project --help)",
       "Bash(node:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(find /Users/vaibhavjain/Documents/claudeforge/templates -name *.gitignore* -o -name gitignore*)",
+      "Bash(node -e \"require\\(''./src/commands/watch''\\)\")"
     ]
   }
 }

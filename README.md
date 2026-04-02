@@ -61,7 +61,8 @@ node --version   # should print v18 or higher
   - [github](#github--cicd--devcontainer)
   - [status](#status--show-whats-configured)
   - [upgrade](#upgrade--update-built-in-templates)
-- [clear](#clear--remove-all-claudeforge-files)
+  - [clear](#clear--remove-all-claudeforge-files)
+  - [watch](#watch--live-agent-activity-dashboard)
 - [Slash Commands (in IDE chat)](#slash-commands-in-ide-chat)
 - [What Gets Scaffolded](#what-gets-scaffolded)
 - [How It Works](#how-it-works)
@@ -78,8 +79,9 @@ node --version   # should print v18 or higher
 - **A thorough code-reviewer agent** that checks correctness, security, performance, test coverage, style, and documentation
 - **GitHub Actions CI/CD** auto-generated for your stack (Node, Python, Go, Rust)
 - **VS Code devcontainer** with the Claude Code extension pre-configured
-- **Hook scripts** that block dangerous operations before they run
+- **Hook scripts** that block dangerous operations before they run — and stream every tool call to a live activity log
 - **A memory system** that persists project context across every Claude session
+- **Live agent dashboard** (`watch`) — a real-time browser UI that shows which agent is running which tool, with a scrolling event feed and active-task panel
 
 ---
 
@@ -361,6 +363,56 @@ After clearing, run `claudeforge init` to scaffold fresh or `claudeforge create`
 
 ---
 
+### `watch` — Live agent activity dashboard
+
+![claudeforge agent activity dashboard](docs/assets/dashboard-preview.svg)
+
+```bash
+claudeforge watch                   # open dashboard at http://localhost:7337
+claudeforge watch --port 8080       # custom port
+claudeforge watch --no-browser      # start server without auto-opening browser
+claudeforge watch --dir ./my-project
+```
+
+Opens a real-time browser dashboard that shows exactly what your Claude agents are doing — which tool is running, on which file or command, and a live scrolling feed of every event.
+
+**How it works:**
+
+The hook scripts scaffolded by `claudeforge init` write a JSON event to `.claude/agent-activity.jsonl` before and after every tool call. `claudeforge watch` tails this file and streams events to the browser via Server-Sent Events (SSE). No polling, no external services — purely local.
+
+```
+Claude Code IDE  →  tool fires
+      ↓
+pre-tool-use.sh  →  appends event to .claude/agent-activity.jsonl
+      ↓
+claudeforge watch  →  tails file via fs.watch  →  SSE  →  browser dashboard
+```
+
+**Dashboard panels:**
+
+| Panel | What it shows |
+|-------|--------------|
+| **Agents sidebar** | One card per agent. Pulses green when active, flashes red on errors, shows call count |
+| **Active task** | The currently running tool — name, icon, agent, exact detail (command / file / query), and animated flow dots while it runs |
+| **Live feed** | Every tool event streamed in real time, colour-coded by tool type, with agent name and timestamp. Capped at 120 items |
+
+**Tool colour coding:**
+
+| Tool | Colour |
+|------|--------|
+| `Bash` | Orange |
+| `Read` | Blue |
+| `Edit` / `Write` | Yellow |
+| `Glob` / `Grep` | Purple |
+| `Agent` | Pink |
+| `WebFetch` / `WebSearch` | Green |
+
+The activity log (`.claude/agent-activity.jsonl`) is gitignored — it's local runtime state. Click **Clear** in the dashboard header to reset it.
+
+> **Note:** Run `claudeforge watch` in a separate terminal while working in Claude Code. The dashboard updates live as you run slash commands or let agents work.
+
+---
+
 ## Slash Commands (in IDE chat)
 
 Run these in the Claude Code chat window in VS Code, JetBrains, or any Claude Code IDE. Works with any Claude model — no separate API key.
@@ -404,12 +456,16 @@ Returns: `✓ LGTM` / `~ LGTM with suggestions` / `⚠ Address warnings` / `✗ 
 
 ### Hook Scripts (auto-`chmod 755`)
 
-**`pre-tool-use.sh`** blocks before every tool call:
-- `rm -rf` on absolute paths outside `/tmp`
-- Editing `.env`, credentials, key files (warns first)
-- `curl | bash` and `wget | sh` patterns
+Both hooks also emit a JSON event to `.claude/agent-activity.jsonl` on every tool call — the data source for `claudeforge watch`.
 
-**`post-tool-use.sh`** injects reminders:
+**`pre-tool-use.sh`** runs before every tool call:
+- Emits a `pre` event (tool name, agent, detail, timestamp) to the activity log
+- Blocks `rm -rf` on absolute paths outside `/tmp`
+- Warns on edits to `.env`, credentials, key files
+- Blocks `curl | bash` and `wget | sh` patterns
+
+**`post-tool-use.sh`** runs after every tool call:
+- Emits a `post` event (including whether the tool errored) to the activity log
 - Prompts to run tests after editing test files
 
 ### Memory System
@@ -451,6 +507,10 @@ Four structured memory files — Claude reads them every session:
 │  add agent ...  ────────────┼─────┼▶  template created           │
 │  status         ────────────┼─────┼▶  summary printed            │
 │  upgrade        ────────────┼─────┼▶  hooks/rules updated        │
+│                             │     │                               │
+│  watch  ────────────────────┼──┐  │  every tool call fires hooks  │
+│   ↳ localhost:7337 dashboard│  └──┼▶  → .claude/agent-activity    │
+│   ↳ live SSE feed           │     │    .jsonl (event log)         │
 └─────────────────────────────┘     └──────────────────────────────┘
 ```
 

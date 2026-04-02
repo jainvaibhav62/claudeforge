@@ -1,0 +1,259 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="outerClip"><rect width="1200" height="700" rx="14"/></clipPath>
+    <clipPath id="mainClip"><rect y="96" width="1200" height="604" rx="0"/></clipPath>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#0a0b0f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="heroGlow" cx="50%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#0a0b0f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g clip-path="url(#outerClip)">
+    <!-- ═══ BROWSER CHROME ════════════════════════════════════════════════ -->
+    <rect width="1200" height="700" fill="#1c1e26"/>
+    <rect width="1200" height="48" fill="#252830"/>
+    <line x1="0" y1="48" x2="1200" y2="48" stroke="#0d0e12" stroke-width="1"/>
+
+    <!-- Traffic lights -->
+    <circle cx="24" cy="24" r="6" fill="#ff5f57"/>
+    <circle cx="44" cy="24" r="6" fill="#febc2e"/>
+    <circle cx="64" cy="24" r="6" fill="#28c840"/>
+
+    <!-- URL bar -->
+    <rect x="120" y="10" width="380" height="28" rx="7" fill="#161820" stroke="#2a2d38" stroke-width="1"/>
+    <text x="310" y="29" font-family="'Courier New',monospace" font-size="12" fill="#6b7280" text-anchor="middle">localhost:7337</text>
+
+    <!-- ═══ DASHBOARD HEADER ═══════════════════════════════════════════════ -->
+    <rect y="48" width="1200" height="48" fill="#111318"/>
+    <line x1="0" y1="96" x2="1200" y2="96" stroke="#1a1d24" stroke-width="1"/>
+
+    <!-- Logo -->
+    <text x="20" y="80" font-family="'Courier New',monospace" font-size="15" font-weight="700" fill="#a78bfa">claudeforge</text>
+    <text x="122" y="80" font-family="'Courier New',monospace" font-size="15" font-weight="400" fill="#4b5563">.watch</text>
+
+    <!-- Live indicator -->
+    <circle cx="174" cy="72" r="5" fill="#4ade80">
+      <animate attributeName="opacity" values="1;0.25;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="174" cy="72" r="9" fill="#4ade80" opacity="0">
+      <animate attributeName="r" values="5;11;5" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.35;0;0.35" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="186" y="77" font-family="'Courier New',monospace" font-size="12" fill="#4ade80">live</text>
+
+    <!-- Event count -->
+    <text x="1060" y="77" font-family="'Courier New',monospace" font-size="11" fill="#4b5563">247 events</text>
+
+    <!-- Clear button -->
+    <rect x="1148" y="59" width="40" height="22" rx="5" fill="none" stroke="#2a2d38" stroke-width="1"/>
+    <text x="1168" y="74" font-size="11" fill="#6b7280" text-anchor="middle" font-family="system-ui,sans-serif">Clear</text>
+
+    <!-- ═══ MAIN LAYOUT ═══════════════════════════════════════════════════ -->
+    <g clip-path="url(#mainClip)">
+
+      <!-- Background fills -->
+      <rect y="96" width="1200" height="604" fill="#0a0b0f"/>
+      <rect x="880" y="96" width="320" height="604" fill="#0a0b0f"/>
+      <!-- Center glow -->
+      <rect x="220" y="96" width="660" height="604" fill="url(#heroGlow)"/>
+
+      <!-- ─── AGENTS SIDEBAR ──────────────────────────────────────────── -->
+      <rect y="96" width="220" height="604" fill="#0a0b0f"/>
+      <line x1="220" y1="96" x2="220" y2="700" stroke="#1a1d24" stroke-width="1"/>
+
+      <!-- Section label -->
+      <text x="16" y="126" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#4b5563" letter-spacing="1.2">AGENTS</text>
+
+      <!-- ── Agent card: claude (idle) ── -->
+      <rect x="10" y="134" width="198" height="68" rx="9" fill="#161820" stroke="#1a1d24" stroke-width="1"/>
+      <circle cx="29" cy="154" r="4.5" fill="#4b5563"/>
+      <text x="40" y="159" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#e8e9f0">claude</text>
+      <text x="19" y="175" font-family="'Courier New',monospace" font-size="10" fill="#4b5563">idle</text>
+      <rect x="19" y="185" width="52" height="12" rx="3" fill="rgba(255,255,255,0.04)"/>
+      <text x="45" y="195" font-size="9.5" fill="#4b5563" text-anchor="middle" font-family="system-ui,sans-serif">0 calls</text>
+
+      <!-- ── Agent card: code-reviewer (ACTIVE) ── -->
+      <rect x="10" y="210" width="198" height="72" rx="9" fill="#161820" stroke="rgba(108,99,255,0.5)" stroke-width="1"/>
+      <rect x="10" y="210" width="198" height="72" rx="9" fill="rgba(108,99,255,0.05)"/>
+      <!-- Pulsing dot -->
+      <circle cx="29" cy="230" r="4.5" fill="#4ade80">
+        <animate attributeName="r" values="4.5;6;4.5" dur="1.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.6;1" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="29" cy="230" r="4.5" fill="#4ade80" opacity="0.25">
+        <animate attributeName="r" values="4.5;11;4.5" dur="1.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.3;0;0.3" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <text x="40" y="235" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#e8e9f0">code-reviewer</text>
+      <text x="19" y="253" font-family="'Courier New',monospace" font-size="10" fill="#fbbf24">✏ Edit</text>
+      <rect x="19" y="262" width="56" height="12" rx="3" fill="rgba(255,255,255,0.04)"/>
+      <text x="47" y="272" font-size="9.5" fill="#6b7280" text-anchor="middle" font-family="system-ui,sans-serif">12 calls</text>
+
+      <!-- ── Agent card: sql-reviewer (idle) ── -->
+      <rect x="10" y="290" width="198" height="68" rx="9" fill="#161820" stroke="#1a1d24" stroke-width="1"/>
+      <circle cx="29" cy="310" r="4.5" fill="#4b5563"/>
+      <text x="40" y="315" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#e8e9f0">sql-reviewer</text>
+      <text x="19" y="331" font-family="'Courier New',monospace" font-size="10" fill="#4b5563">idle</text>
+      <rect x="19" y="341" width="52" height="12" rx="3" fill="rgba(255,255,255,0.04)"/>
+      <text x="45" y="351" font-size="9.5" fill="#4b5563" text-anchor="middle" font-family="system-ui,sans-serif">3 calls</text>
+
+      <!-- ─── ACTIVE TASK PANEL (CENTER) ──────────────────────────────── -->
+      <rect x="220" y="96" width="660" height="604" fill="url(#centerGlow)"/>
+
+      <!-- Panel label -->
+      <text x="550" y="142" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#4b5563" letter-spacing="1.2" text-anchor="middle">ACTIVE TASK</text>
+
+      <!-- Task card -->
+      <rect x="300" y="158" width="500" height="268" rx="15" fill="#111318" stroke="#1a1d24" stroke-width="1" filter="url(#cardShadow)"/>
+
+      <!-- Tool icon circle -->
+      <rect x="332" y="192" width="52" height="52" rx="13" fill="rgba(251,191,36,0.1)" stroke="rgba(251,191,36,0.25)" stroke-width="1"/>
+      <text x="358" y="226" font-size="24" text-anchor="middle">✏️</text>
+
+      <!-- Tool name -->
+      <text x="398" y="213" font-family="system-ui,sans-serif" font-size="22" font-weight="800" fill="#fbbf24">Edit</text>
+      <text x="398" y="232" font-family="system-ui,sans-serif" font-size="12" fill="#6b7280">via <tspan font-weight="600" fill="#a78bfa">code-reviewer</tspan></text>
+
+      <!-- Spinner -->
+      <circle cx="782" cy="210" r="5.5" fill="#4ade80">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Divider -->
+      <line x1="332" y1="260" x2="768" y2="260" stroke="#1a1d24" stroke-width="1"/>
+
+      <!-- Detail box -->
+      <rect x="332" y="274" width="436" height="46" rx="8" fill="rgba(0,0,0,0.4)" stroke="#1a1d24" stroke-width="1"/>
+      <text x="350" y="302" font-family="'Courier New',monospace" font-size="14" fill="#a78bfa">src/billing/checkout.py</text>
+
+      <!-- Meta row -->
+      <text x="332" y="342" font-family="system-ui,sans-serif" font-size="11" fill="#6b7280">Started <tspan fill="#e8e9f0" font-weight="600">14:23:07</tspan></text>
+      <text x="540" y="342" font-family="system-ui,sans-serif" font-size="11" fill="#6b7280">session <tspan fill="#e8e9f0" font-weight="600" font-family="'Courier New',monospace">a4f7b2c1</tspan></text>
+
+      <!-- Flow dots (animated) -->
+      <circle cx="490" cy="376" r="5.5" fill="#1a1d24">
+        <animate attributeName="fill" values="#1a1d24;#a78bfa;#1a1d24" dur="1.5s" begin="0s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="514" cy="376" r="5.5" fill="#1a1d24">
+        <animate attributeName="fill" values="#1a1d24;#a78bfa;#1a1d24" dur="1.5s" begin="0.25s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="538" cy="376" r="5.5" fill="#1a1d24">
+        <animate attributeName="fill" values="#1a1d24;#a78bfa;#1a1d24" dur="1.5s" begin="0.5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Tool legend -->
+      <text x="550" y="464" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#4b5563" letter-spacing="1.2" text-anchor="middle">TOOL LEGEND</text>
+      <rect x="303" y="474" width="494" height="38" rx="8" fill="#161820" stroke="#1a1d24" stroke-width="1"/>
+      <!-- Bash -->
+      <rect x="316" y="484" width="42" height="16" rx="3" fill="rgba(251,146,60,0.15)"/>
+      <text x="337" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#fb923c" text-anchor="middle">⚡ Bash</text>
+      <!-- Read -->
+      <rect x="366" y="484" width="42" height="16" rx="3" fill="rgba(56,189,248,0.12)"/>
+      <text x="387" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#38bdf8" text-anchor="middle">📖 Read</text>
+      <!-- Edit -->
+      <rect x="416" y="484" width="42" height="16" rx="3" fill="rgba(251,191,36,0.12)"/>
+      <text x="437" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#fbbf24" text-anchor="middle">✏️ Edit</text>
+      <!-- Write -->
+      <rect x="466" y="484" width="48" height="16" rx="3" fill="rgba(74,222,128,0.12)"/>
+      <text x="490" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#4ade80" text-anchor="middle">💾 Write</text>
+      <!-- Grep -->
+      <rect x="522" y="484" width="42" height="16" rx="3" fill="rgba(167,139,250,0.12)"/>
+      <text x="543" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#a78bfa" text-anchor="middle">🔎 Grep</text>
+      <!-- Agent -->
+      <rect x="572" y="484" width="48" height="16" rx="3" fill="rgba(244,114,182,0.12)"/>
+      <text x="596" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#f472b6" text-anchor="middle">🤖 Agent</text>
+      <!-- Web -->
+      <rect x="628" y="484" width="56" height="16" rx="3" fill="rgba(52,211,153,0.12)"/>
+      <text x="656" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#34d399" text-anchor="middle">🌐 WebFetch</text>
+      <!-- Glob -->
+      <rect x="692" y="484" width="42" height="16" rx="3" fill="rgba(167,139,250,0.12)"/>
+      <text x="713" y="495" font-family="'Courier New',monospace" font-size="9.5" fill="#a78bfa" text-anchor="middle">🔍 Glob</text>
+
+      <!-- ─── FEED PANEL (RIGHT) ───────────────────────────────────────── -->
+      <line x1="880" y1="96" x2="880" y2="700" stroke="#1a1d24" stroke-width="1"/>
+
+      <!-- Feed label -->
+      <text x="896" y="126" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#4b5563" letter-spacing="1.2">LIVE FEED</text>
+
+      <!-- Feed item 1 (newest — brightest) -->
+      <rect x="888" y="134" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1"/>
+      <circle cx="903" cy="160" r="3.5" fill="#4ade80">
+        <animate attributeName="opacity" values="1;0.4;1" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="911" y="145" width="54" height="16" rx="3" fill="rgba(251,191,36,0.13)"/>
+      <text x="938" y="156" font-family="'Courier New',monospace" font-size="9.5" fill="#fbbf24" text-anchor="middle">✏️ Edit</text>
+      <text x="972" y="156" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">code-reviewer</text>
+      <text x="1176" y="156" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:23:07</text>
+      <text x="911" y="175" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">src/billing/checkout.py</text>
+
+      <!-- Feed item 2 -->
+      <rect x="888" y="192" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1" opacity="0.85"/>
+      <circle cx="903" cy="218" r="3.5" fill="#4b5563"/>
+      <rect x="911" y="203" width="50" height="16" rx="3" fill="rgba(56,189,248,0.1)"/>
+      <text x="936" y="214" font-family="'Courier New',monospace" font-size="9.5" fill="#38bdf8" text-anchor="middle">📖 Read</text>
+      <text x="968" y="214" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">code-reviewer</text>
+      <text x="1176" y="214" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:23:05</text>
+      <text x="911" y="233" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">src/billing/checkout.py</text>
+
+      <!-- Feed item 3 -->
+      <rect x="888" y="250" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1" opacity="0.72"/>
+      <circle cx="903" cy="276" r="3.5" fill="#4b5563"/>
+      <rect x="911" y="261" width="48" height="16" rx="3" fill="rgba(167,139,250,0.1)"/>
+      <text x="935" y="272" font-family="'Courier New',monospace" font-size="9.5" fill="#a78bfa" text-anchor="middle">🔎 Grep</text>
+      <text x="966" y="272" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">claude</text>
+      <text x="1176" y="272" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:23:02</text>
+      <text x="911" y="291" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">pattern: "stripe_id"</text>
+
+      <!-- Feed item 4 -->
+      <rect x="888" y="308" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1" opacity="0.58"/>
+      <circle cx="903" cy="334" r="3.5" fill="#4b5563"/>
+      <rect x="911" y="319" width="50" height="16" rx="3" fill="rgba(251,191,36,0.1)"/>
+      <text x="936" y="330" font-family="'Courier New',monospace" font-size="9.5" fill="#fbbf24" text-anchor="middle">✏️ Edit</text>
+      <text x="966" y="330" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">claude</text>
+      <text x="1176" y="330" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:22:58</text>
+      <text x="911" y="349" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">src/auth/middleware.ts</text>
+
+      <!-- Feed item 5 -->
+      <rect x="888" y="366" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1" opacity="0.46"/>
+      <circle cx="903" cy="392" r="3.5" fill="#4b5563"/>
+      <rect x="911" y="377" width="48" height="16" rx="3" fill="rgba(251,146,60,0.1)"/>
+      <text x="935" y="388" font-family="'Courier New',monospace" font-size="9.5" fill="#fb923c" text-anchor="middle">⚡ Bash</text>
+      <text x="966" y="388" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">code-reviewer</text>
+      <text x="1176" y="388" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:22:54</text>
+      <text x="911" y="407" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">pytest tests/ -q</text>
+
+      <!-- Feed item 6 -->
+      <rect x="888" y="424" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1" opacity="0.34"/>
+      <circle cx="903" cy="450" r="3.5" fill="#4b5563"/>
+      <rect x="911" y="435" width="50" height="16" rx="3" fill="rgba(56,189,248,0.1)"/>
+      <text x="936" y="446" font-family="'Courier New',monospace" font-size="9.5" fill="#38bdf8" text-anchor="middle">📖 Read</text>
+      <text x="966" y="446" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">claude</text>
+      <text x="1176" y="446" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:22:51</text>
+      <text x="911" y="465" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">src/auth/types.ts</text>
+
+      <!-- Feed item 7 -->
+      <rect x="888" y="482" width="296" height="52" rx="7" fill="#161820" stroke="#1a1d24" stroke-width="1" opacity="0.22"/>
+      <circle cx="903" cy="508" r="3.5" fill="#4b5563"/>
+      <rect x="911" y="493" width="72" height="16" rx="3" fill="rgba(52,211,153,0.1)"/>
+      <text x="947" y="504" font-family="'Courier New',monospace" font-size="9.5" fill="#34d399" text-anchor="middle">🌐 WebSearch</text>
+      <text x="990" y="504" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">claude</text>
+      <text x="1176" y="504" font-family="'Courier New',monospace" font-size="9.5" fill="#4b5563" text-anchor="end">14:22:47</text>
+      <text x="911" y="523" font-family="'Courier New',monospace" font-size="9.5" fill="#6b7280">stripe checkout session docs</text>
+
+    </g>
+  </g>
+
+  <!-- Outer border -->
+  <rect width="1200" height="700" rx="14" fill="none" stroke="#2a2d38" stroke-width="1.5"/>
+</svg>

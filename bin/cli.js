@@ -11,6 +11,7 @@ const upgradeCommand = require('../src/commands/upgrade');
 const createCommand = require('../src/commands/create');
 const githubCommand = require('../src/commands/github');
 const clearCommand = require('../src/commands/clear');
+const watchCommand = require('../src/commands/watch');
 
 program
   .name('claudeforge')
@@ -176,5 +177,25 @@ Examples:
   $ claudeforge clear --force     # skip confirmation prompt
   `)
   .action(clearCommand);
+
+// ── watch ─────────────────────────────────────────────────────────────────────
+program
+  .command('watch')
+  .description('Open the live agent activity dashboard — shows which agent is running which tool in real time')
+  .option('-d, --dir <path>',  'Project directory (defaults to current directory)')
+  .option('-p, --port <port>', 'Dashboard port (default: 7337)')
+  .option('--no-browser',      'Do not auto-open the browser')
+  .addHelpText('after', `
+Starts a local server at http://localhost:7337 that streams agent activity
+from .claude/agent-activity.jsonl via Server-Sent Events.
+
+The hooks scaffold by claudeforge write to this log on every Claude tool call.
+Run this in a separate terminal while working in Claude Code.
+
+Example:
+  $ claudeforge watch
+  $ claudeforge watch --port 8080 --no-browser
+  `)
+  .action(watchCommand);
 
 program.parse(process.argv);

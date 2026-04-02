@@ -36,6 +36,39 @@ TOOL_NAME=$(json_get "tool_name")
 COMMAND=$(json_get "tool_input.command")
 FILE_PATH=$(json_get "tool_input.path")
 
+# ── Emit event to claudeforge agent activity log ──────────────────────────────
+if [ -d ".claude" ]; then
+  echo "$INPUT" | python3 -c "
+import sys, json, time
+try:
+    d = json.loads(sys.stdin.read())
+    tool = d.get('tool_name', '')
+    inp  = d.get('tool_input', {})
+    # Build a human-readable detail string based on tool type
+    detail = ''
+    if tool == 'Bash':       detail = inp.get('command', '')[:120]
+    elif tool in ('Read', 'Edit', 'Write', 'MultiEdit'):
+        detail = inp.get('file_path', inp.get('path', ''))
+    elif tool == 'Glob':     detail = inp.get('pattern', '')
+    elif tool == 'Grep':     detail = inp.get('pattern', '')
+    elif tool == 'Agent':    detail = inp.get('description', '')[:120]
+    elif tool == 'WebFetch': detail = inp.get('url', '')[:120]
+    elif tool == 'WebSearch':detail = inp.get('query', '')[:120]
+    event = {
+        'ts':      int(time.time() * 1000),
+        'type':    'pre',
+        'tool':    tool,
+        'agent':   d.get('agent_name') or d.get('agentName') or 'claude',
+        'session': d.get('session_id', ''),
+        'detail':  detail,
+    }
+    with open('.claude/agent-activity.jsonl', 'a') as f:
+        f.write(json.dumps(event) + '\n')
+except:
+    pass
+" 2>/dev/null || true
+fi
+
 # ── Rule 1: Block rm -rf on paths outside /tmp ────────────────────────────────
 if [[ "$TOOL_NAME" == "Bash" ]]; then
   if echo "$COMMAND" | grep -qE 'rm\s+-[rf]+\s+/' && ! echo "$COMMAND" | grep -qE 'rm\s+-[rf]+\s+/tmp'; then

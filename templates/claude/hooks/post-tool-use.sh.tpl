@@ -32,6 +32,42 @@ except:
 TOOL_NAME=$(json_get "tool_name")
 FILE_PATH=$(json_get "tool_input.path")
 
+# ── Emit event to claudeforge agent activity log ──────────────────────────────
+if [ -d ".claude" ]; then
+  echo "$INPUT" | python3 -c "
+import sys, json, time
+try:
+    d = json.loads(sys.stdin.read())
+    tool = d.get('tool_name', '')
+    inp  = d.get('tool_input', {})
+    detail = ''
+    if tool == 'Bash':       detail = inp.get('command', '')[:120]
+    elif tool in ('Read', 'Edit', 'Write', 'MultiEdit'):
+        detail = inp.get('file_path', inp.get('path', ''))
+    elif tool == 'Glob':     detail = inp.get('pattern', '')
+    elif tool == 'Grep':     detail = inp.get('pattern', '')
+    elif tool == 'Agent':    detail = inp.get('description', '')[:120]
+    elif tool == 'WebFetch': detail = inp.get('url', '')[:120]
+    elif tool == 'WebSearch':detail = inp.get('query', '')[:120]
+    # Capture whether the tool succeeded or errored
+    resp = d.get('tool_response', {})
+    is_error = resp.get('is_error', False) if isinstance(resp, dict) else False
+    event = {
+        'ts':      int(time.time() * 1000),
+        'type':    'post',
+        'tool':    tool,
+        'agent':   d.get('agent_name') or d.get('agentName') or 'claude',
+        'session': d.get('session_id', ''),
+        'detail':  detail,
+        'error':   is_error,
+    }
+    with open('.claude/agent-activity.jsonl', 'a') as f:
+        f.write(json.dumps(event) + '\n')
+except:
+    pass
+" 2>/dev/null || true
+fi
+
 # ── Reminder: run tests after editing test files ──────────────────────────────
 if [[ "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Write" || "$TOOL_NAME" == "MultiEdit" ]]; then
   if echo "$FILE_PATH" | grep -qiE '\.(test|spec)\.[jt]sx?$|_test\.go$|test_.*\.py$|.*_spec\.rb$'; then

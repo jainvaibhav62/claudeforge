@@ -7,6 +7,7 @@ CLAUDE.local.md
 .claude/cache/
 .claude/debug/
 .claude/history.jsonl
+.claude/agent-activity.jsonl
 
 # ── MCP servers ──────────────────────────────────────────────────────────────
 # .mcp.json is committed (team-shared server config)
